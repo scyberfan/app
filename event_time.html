@@ -3,20 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXT 鍵閉め計算</title>
+<title>特典会人数計算ツール</title>
 <style>
 *{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
 body{margin:0;padding:24px 16px 60px;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Yu Gothic",sans-serif;background:#f5f7fb;color:#222}
 .container{width:100%;max-width:480px;margin:0 auto}
 h1{margin:8px 0 6px;text-align:center;font-size:24px}
 .subtitle{margin:0 0 24px;text-align:center;font-size:13px;color:#777}
-.card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.06);margin-bottom:16px}
-.field{margin-bottom:20px}.field:last-child{margin-bottom:0}
+.card{width:100%;background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}
+.field{margin-bottom:20px;min-width:0}.field:last-child{margin-bottom:0}
 label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:#555}
 .current-time{font-size:30px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums}
-input{width:100%;height:50px;padding:0 14px;border:1px solid #dfe3eb;border-radius:12px;background:#fff;font-size:17px}
-.loop-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.loop-button{height:48px;border:1px solid #dfe3eb;border-radius:12px;background:#fff;font-size:16px;font-weight:600;cursor:pointer}
+input{display:block;width:100%;max-width:100%;min-width:0;height:50px;padding:0 14px;border:1px solid #dfe3eb;border-radius:12px;background:#fff;font-size:17px}
+input[type="time"]{-webkit-appearance:none;appearance:none}
+.loop-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.loop-button{min-width:0;height:48px;border:1px solid #dfe3eb;border-radius:12px;background:#fff;font-size:16px;font-weight:600;cursor:pointer}
 .loop-button.active{background:#222;color:#fff;border-color:#222}
 .calculate{width:100%;height:56px;border:none;border-radius:15px;background:#222;color:#fff;font-size:17px;font-weight:700;cursor:pointer}
 #result{display:none}
@@ -26,33 +28,56 @@ input{width:100%;height:50px;padding:0 14px;border:1px solid #dfe3eb;border-radi
 .result-range{font-size:14px;color:#555}
 .start-info{margin-top:10px;font-size:12px;color:#999}
 .list-title{margin:5px 0 10px;font-size:14px;font-weight:700}
-.person{display:flex;align-items:center;justify-content:space-between;padding:13px 12px;border-bottom:1px solid #eee;font-variant-numeric:tabular-nums}
+.person{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 12px;border-bottom:1px solid #eee;font-variant-numeric:tabular-nums}
 .person:last-child{border-bottom:none}
-.person-number{font-weight:600}.person-time{font-size:15px}
-.key-person{margin-top:5px;border:2px solid #222;border-radius:12px;background:#fafafa}
+.person-number{font-weight:600}.person-time{font-size:15px;white-space:nowrap}
+.key-person{margin:5px 0 4px;border:2px solid #222;border-radius:12px;background:#fafafa}
 .key-badge{display:inline-block;margin-left:6px;padding:3px 7px;border-radius:20px;background:#222;color:#fff;font-size:10px;vertical-align:2px}
 .error{display:none;margin-top:12px;color:#d33;font-size:13px;text-align:center}
+@media(max-width:380px){
+body{padding-left:12px;padding-right:12px}
+.card{padding:16px}
+h1{font-size:22px}
+}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🔑 NEXT 鍵閉め計算</h1>
+<h1>特典会人数計算ツール</h1>
 <p class="subtitle">NEXT札を持つ人を時間から予測</p>
+
 <div class="card">
-<div class="field"><label>現在時刻</label><div class="current-time" id="clock">--:--:--</div></div>
-<div class="field"><label for="nextTime">NEXT時間</label><input type="time" id="nextTime" step="60"></div>
-<div class="field"><label>1ループあたりの時間</label><div class="loop-buttons">
+<div class="field">
+<label>現在時刻</label>
+<div class="current-time" id="clock">--:--:--</div>
+</div>
+
+<div class="field">
+<label for="nextTime">NEXT時間</label>
+<input type="time" id="nextTime" step="60">
+</div>
+
+<div class="field">
+<label>1ループあたりの時間</label>
+<div class="loop-buttons">
 <button class="loop-button" data-seconds="60">1:00</button>
 <button class="loop-button active" data-seconds="90">1:30</button>
 <button class="loop-button" data-seconds="120">2:00</button>
-</div></div>
-<div class="field"><label for="buffer">バッファー</label><input type="number" id="buffer" min="0" value="5" inputmode="numeric" placeholder="秒数"></div>
-<button class="calculate" id="calculate">鍵閉めを計算</button>
+</div>
+</div>
+
+<div class="field">
+<label for="buffer">バッファー（秒）</label>
+<input type="number" id="buffer" min="0" value="5" inputmode="numeric" placeholder="秒数">
+</div>
+
+<button class="calculate" id="calculate">人数を計算</button>
 <div class="error" id="error"></div>
 </div>
+
 <div class="card" id="result">
 <div class="result-main">
-<div class="result-label">🔑 鍵閉め予測</div>
+<div class="result-label">予測人数</div>
 <div class="result-number" id="keyNumber">-</div>
 <div class="result-range" id="keyRange"></div>
 <div class="start-info" id="startInfo"></div>
@@ -61,51 +86,101 @@ input{width:100%;height:50px;padding:0 14px;border:1px solid #dfe3eb;border-radi
 <div id="personList"></div>
 </div>
 </div>
+
 <script>
 let loopSeconds=90;
-function formatTime(date){return [String(date.getHours()).padStart(2,"0"),String(date.getMinutes()).padStart(2,"0"),String(date.getSeconds()).padStart(2,"0")].join(":")}
-function updateClock(){document.getElementById("clock").textContent=formatTime(new Date())}
-setInterval(updateClock,250);updateClock();
-document.querySelectorAll(".loop-button").forEach(button=>button.addEventListener("click",()=>{
+
+function formatTime(date){
+return [
+String(date.getHours()).padStart(2,"0"),
+String(date.getMinutes()).padStart(2,"0"),
+String(date.getSeconds()).padStart(2,"0")
+].join(":");
+}
+
+function updateClock(){
+document.getElementById("clock").textContent=formatTime(new Date());
+}
+setInterval(updateClock,250);
+updateClock();
+
+document.querySelectorAll(".loop-button").forEach(button=>{
+button.addEventListener("click",()=>{
 document.querySelectorAll(".loop-button").forEach(btn=>btn.classList.remove("active"));
-button.classList.add("active");loopSeconds=Number(button.dataset.seconds);
-}));
+button.classList.add("active");
+loopSeconds=Number(button.dataset.seconds);
+});
+});
+
 document.getElementById("calculate").addEventListener("click",calculate);
+
 function calculate(){
 const startTime=new Date();
 const nextValue=document.getElementById("nextTime").value;
 const buffer=Number(document.getElementById("buffer").value||0);
 document.getElementById("error").style.display="none";
-if(!nextValue){showError("NEXT時間を入力してください");return}
-if(buffer<0){showError("バッファーは0秒以上にしてください");return}
+
+if(!nextValue){showError("NEXT時間を入力してください");return;}
+if(buffer<0){showError("バッファーは0秒以上にしてください");return;}
+
 const [hour,minute]=nextValue.split(":").map(Number);
 const nextTime=new Date(startTime);
 nextTime.setHours(hour,minute,0,0);
-if(nextTime<=startTime)nextTime.setDate(nextTime.getDate()+1);
+
+if(nextTime<=startTime){
+nextTime.setDate(nextTime.getDate()+1);
+}
+
 const perPersonSeconds=loopSeconds+buffer;
 const perPersonMs=perPersonSeconds*1000;
-const diffMs=nextTime-startTime;
+const diffMs=nextTime.getTime()-startTime.getTime();
 const keyIndex=Math.floor(diffMs/perPersonMs)+1;
 const keyStart=new Date(startTime.getTime()+(keyIndex-1)*perPersonMs);
 const keyEnd=new Date(keyStart.getTime()+perPersonMs);
-document.getElementById("keyNumber").textContent=keyIndex+"人目";
-document.getElementById("keyRange").textContent=formatTime(keyStart)+" ～ "+formatTime(keyEnd)+" にNEXT札を所持";
-document.getElementById("startInfo").textContent="計算開始 "+formatTime(startTime)+" ／ 1人 "+formatDuration(perPersonSeconds);
-const list=document.getElementById("personList");list.innerHTML="";
+
+document.getElementById("keyNumber").textContent=keyIndex+"人";
+document.getElementById("keyRange").textContent=
+formatTime(keyStart)+" ～ "+formatTime(keyEnd)+" にNEXT札を所持";
+document.getElementById("startInfo").textContent=
+"計算開始 "+formatTime(startTime)+" ／ 1人 "+formatDuration(perPersonSeconds);
+
+const list=document.getElementById("personList");
+list.innerHTML="";
+
 for(let i=1;i<=keyIndex;i++){
 const time=new Date(startTime.getTime()+(i-1)*perPersonMs);
-const row=document.createElement("div");row.className="person";
-if(i===keyIndex)row.classList.add("key-person");
-const number=document.createElement("div");number.className="person-number";
-number.innerHTML=i+"人目"+(i===keyIndex?'<span class="key-badge">鍵閉め</span>':"");
-const timeElement=document.createElement("div");timeElement.className="person-time";timeElement.textContent=formatTime(time);
-row.appendChild(number);row.appendChild(timeElement);list.appendChild(row);
+const row=document.createElement("div");
+row.className="person";
+if(i===keyIndex) row.classList.add("key-person");
+
+const number=document.createElement("div");
+number.className="person-number";
+number.innerHTML=i+"人目"+(i===keyIndex?'<span class="key-badge">NEXT時刻</span>':"");
+
+const timeElement=document.createElement("div");
+timeElement.className="person-time";
+timeElement.textContent=formatTime(time);
+
+row.appendChild(number);
+row.appendChild(timeElement);
+list.appendChild(row);
 }
+
 document.getElementById("result").style.display="block";
 document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
-function formatDuration(seconds){const min=Math.floor(seconds/60),sec=seconds%60;return min+"分"+String(sec).padStart(2,"0")+"秒"}
-function showError(message){const error=document.getElementById("error");error.textContent=message;error.style.display="block"}
+
+function formatDuration(seconds){
+const min=Math.floor(seconds/60);
+const sec=seconds%60;
+return min+"分"+String(sec).padStart(2,"0")+"秒";
+}
+
+function showError(message){
+const error=document.getElementById("error");
+error.textContent=message;
+error.style.display="block";
+}
 </script>
 </body>
 </html>
