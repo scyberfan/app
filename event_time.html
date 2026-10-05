@@ -16,12 +16,23 @@ h1{margin:8px 0 6px;text-align:center;font-size:24px}
 label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:#555}
 .current-time{font-size:30px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums}
 input{display:block;width:100%;max-width:100%;min-width:0;height:50px;padding:0 14px;border:1px solid #dfe3eb;border-radius:12px;background:#fff;font-size:17px}
-input[type="time"]{-webkit-appearance:none;appearance:none}
+input[type="time"]{
+-webkit-appearance:none;
+appearance:none;
+text-align:center;
+text-align-last:center;
+padding-left:14px;
+padding-right:14px;
+}
+input[type="time"]::-webkit-date-and-time-value{
+text-align:center;
+width:100%;
+}
 .loop-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .loop-button{min-width:0;height:48px;border:1px solid #dfe3eb;border-radius:12px;background:#fff;font-size:16px;font-weight:600;cursor:pointer}
 .loop-button.active{background:#222;color:#fff;border-color:#222}
 .calculate{width:100%;height:56px;border:none;border-radius:15px;background:#222;color:#fff;font-size:17px;font-weight:700;cursor:pointer}
-#result{display:none}
+#result{display:none;padding-bottom:40px}
 .result-main{text-align:center;padding:6px 0 18px}
 .result-label{font-size:13px;color:#777}
 .result-number{margin:5px 0;font-size:38px;font-weight:800}
@@ -140,7 +151,7 @@ const keyEnd=new Date(keyStart.getTime()+perPersonMs);
 
 document.getElementById("keyNumber").textContent=keyIndex+"人";
 document.getElementById("keyRange").textContent=
-formatTime(keyStart)+" ～ "+formatTime(keyEnd)+" にNEXT札を所持";
+"鍵締め："+formatTime(keyStart)+" ～ "+formatTime(keyEnd)+" にNEXT札を所持";
 document.getElementById("startInfo").textContent=
 "計算開始 "+formatTime(startTime)+" ／ 1人 "+formatDuration(perPersonSeconds);
 
@@ -155,7 +166,7 @@ if(i===keyIndex) row.classList.add("key-person");
 
 const number=document.createElement("div");
 number.className="person-number";
-number.innerHTML=i+"人目"+(i===keyIndex?'<span class="key-badge">NEXT時刻</span>':"");
+number.innerHTML=i+"人目"+(i===keyIndex?'<span class="key-badge">鍵締め</span>':"");
 
 const timeElement=document.createElement("div");
 timeElement.className="person-time";
