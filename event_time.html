@@ -162,7 +162,7 @@ document.getElementById("startInfo").textContent=
 const list=document.getElementById("personList");
 list.innerHTML="";
 
-for(let i=1;i<=keyIndex;i++){
+for(let i=1;i<=keyIndex+5;i++){
 const time=new Date(startTime.getTime()+(i-1)*perPersonMs);
 const row=document.createElement("div");
 row.className="person";
